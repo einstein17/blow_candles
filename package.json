@@ -1,0 +1,22 @@
+{
+  "name": "cake_app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "http-server",
+    "build": "rm -rf dist && mkdir dist && cp *.html dist/ && cp -r css js dist/",
+    "test": "node tests/ui_test.js",
+    "deploy": "npm run build && cp -r dist/* /opt/homebrew/var/www/candles/ "
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.57.0"
+  }
+}

@@ -1,0 +1,563 @@
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #feca57;
+  --bg-color: #f7f1e3;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body,
+html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: var(--bg-color);
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  color: white;
+  text-align: center;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+#start-btn {
+  margin-top: 20px;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 30px;
+  background: var(--primary-color);
+  color: white;
+  cursor: pointer;
+}
+
+#game-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+#game-container.hidden {
+  display: none;
+}
+
+.cake-display {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+#cake-container {
+  position: relative;
+  width: 280px;
+  height: 280px;
+}
+
+#plate {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 80px;
+  background: radial-gradient(ellipse at center, #fff0f5 0%, #fce4ec 100%);
+  border-radius: 50%;
+  z-index: 0;
+  /* 增加厚度感和阴影 */
+  box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.05), 0 8px 0 #f8bbd0,
+    0 15px 25px rgba(0, 0, 0, 0.15);
+}
+
+#cake-body {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  height: 220px;
+  transition: all 0.5s ease;
+  /* 整体透视感 */
+  perspective: 1000px;
+}
+
+.tier {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  /* 底部圆润，模拟圆柱体 */
+  border-radius: 0 0 120px 120px / 0 0 30px 30px;
+}
+
+/* 每一层的顶部表面 */
+.tier::before {
+  content: "";
+  position: absolute;
+  top: -15px;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  border-radius: 50%;
+  z-index: -1;
+}
+
+.tier-bottom {
+  bottom: 0;
+  height: 100px;
+  background-color: #5d2e2e;
+  /* 侧面渐变模拟光照 + 顶部被遮挡的阴影 + 海绵纹理 */
+  background-image: radial-gradient(rgba(0, 0, 0, 0.05) 2px, transparent 3px),
+    radial-gradient(ellipse at 50% 0%, rgba(0, 0, 0, 0.3) 0%, transparent 70%),
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.15),
+      transparent 20%,
+      transparent 80%,
+      rgba(0, 0, 0, 0.15)
+    );
+  background-size: 12px 12px, 100% 100%, 100% 100%;
+  z-index: 1;
+}
+
+/* 蛋糕底部接触阴影 */
+.tier-bottom::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  filter: blur(4px);
+  z-index: -1;
+}
+
+.tier-bottom::before {
+  background-color: inherit;
+  filter: brightness(1.1);
+  /* 底层蛋糕的顶面也应该是椭圆 */
+  top: -15px;
+  height: 30px;
+}
+
+.tier-top {
+  bottom: 85px;
+  height: 100px;
+  width: 180px;
+  background-color: #ffccbc;
+  /* 侧面渐变 + 弧形水平线 */
+  background-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.1),
+      transparent 20%,
+      transparent 80%,
+      rgba(0, 0, 0, 0.1)
+    ),
+    radial-gradient(
+      ellipse at 50% -20%,
+      transparent 70%,
+      rgba(255, 255, 255, 0.4) 70.5%,
+      rgba(255, 255, 255, 0.4) 71.5%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse at 50% -20%,
+      transparent 85%,
+      rgba(255, 255, 255, 0.4) 85.5%,
+      rgba(255, 255, 255, 0.4) 86.5%,
+      transparent 87%
+    );
+  z-index: 2;
+  border-radius: 0 0 90px 90px / 0 0 25px 25px;
+  /* 层间阴影：顶层蛋糕投射到底层上的阴影 */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.tier-top::before {
+  background-color: inherit;
+  filter: brightness(1.1);
+  top: -12px;
+  height: 24px;
+  /* 确保顶面在最上层，承载装饰物 */
+  z-index: 5;
+  /* 增加边缘高光，模拟倒角 */
+  box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.6);
+}
+
+/* 滴落效果 (使用 SVG 路径作为 clip-path) */
+.drips {
+  position: absolute;
+  top: -10px; /* 向上偏移，使其从顶面边缘流下 */
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background-color: #42a5f5;
+  /* 修改路径，使顶部弧度与顶面椭圆边缘更契合 */
+  clip-path: path(
+    "M 0 12 Q 90 28 180 12 L 180 45 Q 180 85 130 55 Q 100 37 80 65 Q 60 93 40 55 Q 24 25 0 30 Z"
+  );
+  /* 增加滴落效果的阴影 */
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.2));
+  /* 增加内阴影模拟高光 */
+  box-shadow: inset 0 5px 10px rgba(255, 255, 255, 0.4);
+  z-index: 4; /* 位于顶面之下，侧面之上 */
+}
+
+/* 波浪线 (底层) - 增加弧度 */
+.wavy-line {
+  position: absolute;
+  top: 50px;
+  width: 100%;
+  height: 40px;
+  background-image: radial-gradient(
+    circle at 15px -5px,
+    transparent 12px,
+    #fff 13px,
+    #fff 15px,
+    transparent 16px
+  );
+  background-size: 30px 20px;
+  /* 使用弯曲效果 */
+  border-radius: 50% / 20px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  transform: scaleY(0.8);
+}
+
+/* 装饰点 (底层) - 增加弧度 */
+.dots {
+  position: absolute;
+  bottom: 15px;
+  width: 100%;
+  height: 20px;
+  background-image: radial-gradient(#fff 4px, transparent 5px);
+  background-size: 80px 20px;
+  background-position: 40px 0;
+  border-radius: 50% / 10px;
+}
+
+/* 不同蛋糕样式的颜色配置 */
+.cake-type-1 .tier-bottom {
+  background-color: #5d4037;
+}
+.cake-type-1 .tier-top {
+  background-color: #ffe0b2;
+}
+.cake-type-1 .drips,
+.cake-type-1 .drip {
+  background-color: #64b5f6;
+}
+
+.cake-type-2 .tier-bottom {
+  background-color: #ec407a;
+}
+.cake-type-2 .tier-top {
+  background-color: #fce4ec;
+}
+.cake-type-2 .drips,
+.cake-type-2 .drip {
+  background-color: #ad1457;
+}
+
+.cake-type-3 .tier-bottom {
+  background-color: #2e7d32;
+}
+.cake-type-3 .tier-top {
+  background-color: #a5d6a7;
+}
+.cake-type-3 .drips,
+.cake-type-3 .drip {
+  background-color: #ffffff;
+}
+
+#fruit-layer,
+#candle-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.fruit {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle at 30% 30%, #ff5252, #b71c1c);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  /* 增强立体感 + 接触阴影 */
+  box-shadow: inset -2px -2px 5px rgba(0, 0, 0, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* 接触阴影：模拟物体压在表面的环境光遮蔽 */
+.fruit::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  filter: blur(1px);
+  z-index: -1;
+}
+
+/* 樱桃梗 */
+.fruit::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 2px;
+  height: 12px;
+  background: #4caf50;
+  transform: rotate(10deg);
+}
+
+.candle {
+  position: absolute;
+  width: 10px;
+  height: 60px;
+  background-color: #3f51b5;
+  border-radius: 2px;
+  transform: translate(-50%, -100%) scaleY(0);
+  transform-origin: bottom center;
+  /* 侧面渐变 + 螺旋纹理 */
+  background-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.2),
+      transparent 20%,
+      transparent 80%,
+      rgba(0, 0, 0, 0.2)
+    ),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 6px,
+      rgba(255, 255, 255, 0.4) 6px,
+      rgba(255, 255, 255, 0.4) 12px
+    );
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  animation: grow-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* 蜡烛接触阴影 */
+.candle::before {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+.flame {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  width: 16px;
+  height: 26px;
+  background: radial-gradient(
+    circle at bottom,
+    #fff 10%,
+    #fffa65 30%,
+    #ff9f43 60%,
+    #ff4d4d 90%
+  );
+  border-radius: 50% 50% 20% 20%;
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+  animation: flame-flicker 0.6s infinite ease-in-out;
+  filter: drop-shadow(0 0 5px rgba(255, 159, 67, 0.6));
+}
+
+.controls {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-bottom: 20px;
+}
+
+.candle-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.icon-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  transition: all 0.1s ease;
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.icon-btn:disabled,
+.icon-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+#candle-count {
+  font-size: 1.5rem;
+  font-weight: bold;
+  min-width: 30px;
+  text-align: center;
+}
+
+.cake-selector {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.selector-item {
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
+  font-size: 0; /* 隐藏文字 */
+  position: relative;
+}
+
+.selector-item::after {
+  content: "";
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.selector-item[data-type="1"]::after {
+  background: #5d4037;
+  border: 2px solid #ffe0b2;
+}
+.selector-item[data-type="2"]::after {
+  background: #ec407a;
+  border: 2px solid #fce4ec;
+}
+.selector-item[data-type="3"]::after {
+  background: #2e7d32;
+  border: 2px solid #a5d6a7;
+}
+
+.selector-item.active {
+  border-color: var(--primary-color);
+  background-color: #fff8e1;
+}
+
+#blow-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--primary-color);
+  padding: 12px 24px;
+  border-radius: 25px;
+  z-index: 1100;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  animation: hint-pulse 2s infinite ease-in-out;
+  white-space: nowrap;
+}
+
+#blow-hint::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
+}
+
+@keyframes hint-pulse {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes grow-in {
+  to {
+    transform: translate(-50%, -100%) scaleY(1);
+  }
+}
+
+.hidden {
+  display: none !important;
+}
