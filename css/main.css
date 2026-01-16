@@ -534,6 +534,29 @@ html {
   border-color: rgba(255, 255, 255, 0.95) transparent transparent transparent;
 }
 
+.audio-control {
+  position: fixed;
+  right: 18px;
+  bottom: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-control.is-playing {
+  background: var(--primary-color);
+  color: #fff;
+}
+
 @keyframes hint-pulse {
   0%,
   100% {
