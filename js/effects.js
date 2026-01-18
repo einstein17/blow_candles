@@ -28,8 +28,8 @@ class EffectsManager {
         balloon.style.setProperty("--balloon-hue", hue);
         balloon.style.borderBottomColor = color; // 用于伪元素的结
 
-        // 随机上升速度 (4s - 7s)
-        const duration = 4 + Math.random() * 3;
+        // 上升速度与生日动画时长一致（8s）
+        const duration = 8;
         balloon.style.animation = `balloon-rise ${duration}s ease-in forwards`;
 
         document.body.appendChild(balloon);
@@ -81,14 +81,14 @@ class EffectsManager {
     this.isActive = true;
     this.animateConfetti();
 
-    // 5秒后停止
+    // 8秒后停止，与生日动画时长一致
     setTimeout(() => {
       this.isActive = false;
       if (this.ctx && this.canvas) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       }
       document.body.classList.remove("effect-active");
-    }, 5000);
+    }, 8000);
   }
 
   animateConfetti() {
